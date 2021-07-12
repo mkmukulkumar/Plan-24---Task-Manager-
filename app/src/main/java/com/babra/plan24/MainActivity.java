@@ -1,6 +1,7 @@
 package com.babra.plan24;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -9,6 +10,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
     Button cancel_button, save_button;
     EditText popup_task_name,popup_hh,popup_mm,popup_ss;
     RecyclerView task_list;
-    String[] data = {"sajc", "sacbsa", "dfadsnf"};
+    TextView instruction;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,14 +37,11 @@ public class MainActivity extends AppCompatActivity {
         //finding XMLs by ids
         FloatingActionButton fab = findViewById(R.id.fab);
         task_list = findViewById(R.id.task_list);
+        instruction = findViewById(R.id.instruction);
         detail_popup = new Dialog(MainActivity.this);
-
-        //RecyclerView Setup
-        task_list.setLayoutManager(new LinearLayoutManager(this));
-        CustomAdapter adapter = new CustomAdapter(data);
-        task_list.setAdapter(adapter);
-        get_all st1 = new get_all();
-        st1.start();
+        //getting all data in recyclerview
+        get_all st = new get_all();
+        st.start();
         //Popup functionality and floating buttons
         fab.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -66,14 +65,12 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View view) {
                         //Room database setup
-                        task_data data3 = new task_data();
-                        data3.setTask_name(popup_task_name.getText().toString().trim());
-                        data3.setHH(Integer.parseInt(popup_hh.getText().toString().trim()));
-                        data3.setMM(Integer.parseInt(popup_mm.getText().toString().trim()));
-                        data3.setSS(Integer.parseInt(popup_ss.getText().toString().trim()));
-                        add_ask st = new add_ask(data3);
-                        st.start();
-                        get_all st1 = new get_all();
+                        task_data input_data = new task_data();
+                        input_data.setTask_name(popup_task_name.getText().toString().trim());
+                        input_data.setHH(Integer.parseInt(popup_hh.getText().toString().trim()));
+                        input_data.setMM(Integer.parseInt(popup_mm.getText().toString().trim()));
+                        input_data.setSS(Integer.parseInt(popup_ss.getText().toString().trim()));
+                        add_ask st1 = new add_ask(input_data);
                         st1.start();
                         detail_popup.dismiss();
 
@@ -84,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+
     class add_ask extends Thread {
         task_data data3;
         add_ask(task_data data3) {
@@ -93,14 +91,24 @@ public class MainActivity extends AppCompatActivity {
             task_data_database db = Room.databaseBuilder(getApplicationContext(), task_data_database.class, "database-name").build();
             task_data_dao task_data_dao = db.task_data_dao();
             task_data_dao.insert(data3);
+            startActivity(new Intent(getApplicationContext(), MainActivity.class));
         }
     }
+
     class get_all extends Thread {
         public void run() {
             task_data_database db1 = Room.databaseBuilder(getApplicationContext(), task_data_database.class, "database-name").build();
             task_data_dao task_data_dao = db1.task_data_dao();
-            List<String> data3 = task_data_dao.getAll();
-            System.out.println(data3);
+            List<String> all_data = task_data_dao.getAll();
+            if (all_data.isEmpty())
+                {
+                    instruction.setVisibility(View.VISIBLE);
+                }
+            //RecyclerView Setup
+            task_list.setLayoutManager(new LinearLayoutManager(MainActivity.this));
+            CustomAdapter adapter = new CustomAdapter(all_data);
+            task_list.setAdapter(adapter);
+
         }
     }
 }
