@@ -10,8 +10,8 @@ import java.util.List;
 
 @Dao
 public interface task_data_dao {
-    @Query("SELECT task_name FROM task_data")
-    List<String> getAll();
+    @Query("SELECT * FROM task_data")
+    List<task_data> getAll();
 
     @Insert
     void insert(task_data task);

@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
         public void run() {
             task_data_database db1 = Room.databaseBuilder(getApplicationContext(), task_data_database.class, "database-name").build();
             task_data_dao task_data_dao = db1.task_data_dao();
-            List<String> all_data = task_data_dao.getAll();
+            List<task_data> all_data = task_data_dao.getAll();
             if (all_data.isEmpty())
                 {
                     instruction.setVisibility(View.VISIBLE);
