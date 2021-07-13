@@ -42,8 +42,8 @@ public class MainActivity extends AppCompatActivity {
         //getting all data in recyclerview
         get_all st = new get_all();
         st.start();
-        deltask dt = new deltask();
-        dt.start();
+//        deltask dt = new deltask();
+//        dt.start();
         //Popup functionality and floating buttons
         fab.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -98,15 +98,15 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    class deltask extends Thread {
-        final task_data task = (task_data) getIntent().getSerializableExtra("task");
-        public void run(){
-            task_data_database db = Room.databaseBuilder(MainActivity.this, task_data_database.class, "database-name").build();
-            task_data_dao task_data_dao = db.task_data_dao();
-            task_data_dao.delete(task);
-            startActivity(new Intent(getApplicationContext(), MainActivity.class));
-        }
-    }
+//    class deltask extends Thread {
+//        final task_data task = (task_data) getIntent().getSerializableExtra("task");
+//        public void run(){
+//            task_data_database db = Room.databaseBuilder(MainActivity.this, task_data_database.class, "database-name").build();
+//            task_data_dao task_data_dao = db.task_data_dao();
+//            task_data_dao.delete(task);
+//            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+//        }
+//    }
 
     class get_all extends Thread {
         public void run() {
