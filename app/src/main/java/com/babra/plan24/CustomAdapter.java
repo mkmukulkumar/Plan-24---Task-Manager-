@@ -1,10 +1,13 @@
 package com.babra.plan24;
 
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,7 +23,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
      * Provide a reference to the type of views that you are using
      * (custom ViewHolder).
      */
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder {
         private final TextView list_task_name;
         private final TextView list_HH;
         private final TextView list_MM;
@@ -34,6 +37,17 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
             list_HH=view.findViewById(R.id.list_HH);
             list_MM=view.findViewById(R.id.list_MM);
             list_SS=view.findViewById(R.id.list_SS);
+            Button del_button = view.findViewById(R.id.del_button);
+            del_button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Toast.makeText(view.getContext(), getTextView().getText(), Toast.LENGTH_SHORT).show();
+                    task_data task = localDataSet.get(getAdapterPosition());
+
+                    Intent intent = new Intent(view.getContext(),MainActivity.class);
+                    intent.putExtra("task", String.valueOf(task));
+                }
+            });
         }
 
         public TextView getTextView() {
