@@ -13,6 +13,9 @@ public interface task_data_dao {
     @Query("SELECT * FROM task_data")
     List<task_data> getAll();
 
+    @Query("DELETE FROM task_data")
+    void deleteAll();
+
     @Insert
     void insert(task_data task);
 

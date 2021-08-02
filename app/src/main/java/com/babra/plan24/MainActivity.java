@@ -10,7 +10,9 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.NumberPicker;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,9 +27,10 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
     Dialog detail_popup;
     Button cancel_button, save_button;
-    EditText popup_task_name,popup_hh,popup_mm,popup_ss;
+    EditText popup_task_name;
     RecyclerView task_list;
-    TextView instruction;
+    TextView instruction,delete_all;
+    NumberPicker pickMM,pickHH,pickSS;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,12 +41,22 @@ public class MainActivity extends AppCompatActivity {
         FloatingActionButton fab = findViewById(R.id.fab);
         task_list = findViewById(R.id.task_list);
         instruction = findViewById(R.id.instruction);
+        delete_all=findViewById(R.id.delete_all);
         detail_popup = new Dialog(MainActivity.this);
+
         //getting all data in recyclerview
         get_all st = new get_all();
         st.start();
-//        deltask dt = new deltask();
-//        dt.start();
+
+        delete_all.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                deleteAll del = new deleteAll();
+                del.start();
+            }
+        });
+
         //Popup functionality and floating buttons
         fab.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -52,9 +65,31 @@ public class MainActivity extends AppCompatActivity {
 
                 detail_popup.setContentView(R.layout.detail_popup);
                 popup_task_name=detail_popup.findViewById(R.id.popup_task_name);
-                popup_hh=detail_popup.findViewById(R.id.popup_hh);
-                popup_mm=detail_popup.findViewById(R.id.popup_mm);
-                popup_ss=detail_popup.findViewById(R.id.popup_ss);
+                pickHH = detail_popup.findViewById(R.id.pickHH);
+                pickHH.setMaxValue(23);
+                pickHH.setMinValue(0);
+                pickHH.setValue(0);
+                pickHH.setOnValueChangedListener((numberPicker, i, i1) -> pickHH.setValue(i1));
+                pickMM = detail_popup.findViewById(R.id.pickMM);
+                pickMM.setMaxValue(59);
+                pickMM.setMinValue(0);
+                pickMM.setValue(0);
+                pickMM.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+                    @Override
+                    public void onValueChange(NumberPicker numberPicker, int i, int i1) {
+                        pickMM.setValue(i1);
+                    }
+                });
+                pickSS = detail_popup.findViewById(R.id.pickSS);
+                pickSS.setMaxValue(59);
+                pickSS.setMinValue(0);
+                pickSS.setValue(0);
+                pickSS.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+                    @Override
+                    public void onValueChange(NumberPicker numberPicker, int i, int i1) {
+                        pickSS.setValue(i1);
+                    }
+                });
                 cancel_button = detail_popup.findViewById(R.id.cancel_button);
                 save_button = detail_popup.findViewById(R.id.save_button);
                 Window window = detail_popup.getWindow();
@@ -69,9 +104,9 @@ public class MainActivity extends AppCompatActivity {
                         //Room database setup
                         task_data input_data = new task_data();
                         input_data.setTask_name(popup_task_name.getText().toString().trim());
-                        input_data.setHH(Integer.parseInt(popup_hh.getText().toString().trim()));
-                        input_data.setMM(Integer.parseInt(popup_mm.getText().toString().trim()));
-                        input_data.setSS(Integer.parseInt(popup_ss.getText().toString().trim()));
+                        input_data.setHH(pickHH.getValue());
+                        input_data.setMM(pickMM.getValue());
+                        input_data.setSS(pickSS.getValue());
                         add_ask st1 = new add_ask(input_data);
                         st1.start();
                         detail_popup.dismiss();
@@ -98,15 +133,16 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-//    class deltask extends Thread {
-//        final task_data task = (task_data) getIntent().getSerializableExtra("task");
-//        public void run(){
-//            task_data_database db = Room.databaseBuilder(MainActivity.this, task_data_database.class, "database-name").build();
-//            task_data_dao task_data_dao = db.task_data_dao();
-//            task_data_dao.delete(task);
-//            startActivity(new Intent(getApplicationContext(), MainActivity.class));
-//        }
-//    }
+    class deleteAll extends Thread {
+        public void run(){
+            task_data_database db = Room.databaseBuilder(getApplicationContext(), task_data_database.class, "database-name").build();
+            task_data_dao task_data_dao = db.task_data_dao();
+            task_data_dao.deleteAll();
+            Toast.makeText(MainActivity.this, "Deleted", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+        }
+    }
+
 
     class get_all extends Thread {
         public void run() {
@@ -121,8 +157,12 @@ public class MainActivity extends AppCompatActivity {
             task_list.setLayoutManager(new LinearLayoutManager(MainActivity.this));
             CustomAdapter adapter = new CustomAdapter(all_data);
             task_list.setAdapter(adapter);
-
         }
     }
-
 }
+
+
+//delete particular entry needed
+//Refresh after adding or deletion
+//Swipe features if possible
+//UI Enhancement

@@ -10,5 +10,9 @@
     <string name="task_name">Task Name</string>
     <string name="save_button">Save</string>
     <string name="cancel_button">Cancel</string>
+    <string name="Hours">Hours</string>
+    <string name="Minutes">Minutes</string>
+    <string name="Seconds">Seconds</string>
+    <string name="Delete_all"><u>Delete All</u></string>
 
 </resources>

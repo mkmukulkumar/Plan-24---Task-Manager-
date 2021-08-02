@@ -1,15 +1,18 @@
 package com.babra.plan24;
 
 
+import android.icu.text.DecimalFormat;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.room.Room;
 
 import java.util.List;
 
@@ -40,11 +43,13 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
             del_button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Toast.makeText(view.getContext(), getTextView().getText(), Toast.LENGTH_SHORT).show();
+
+//                    Toast.makeText(view.getContext(), getTextView().getText(), Toast.LENGTH_SHORT).show();
                     task_data task = localDataSet.get(getAdapterPosition());
-                    System.out.println(task);
-//                    Intent intent = new Intent(view.getContext(),MainActivity.class);
-//                    intent.putExtra("task", String.valueOf(task));
+                    task_data_database db1 = Room.databaseBuilder(view.getContext(), task_data_database.class, "database-name").allowMainThreadQueries().build();
+                    task_data_dao task_data_dao = db1.task_data_dao();
+                    task_data_dao.delete(task);
+
                 }
             });
         }
@@ -88,15 +93,20 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
 
 
     // Replace the contents of a view (invoked by the layout manager)
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, final int position) {
 
         // Get element from your dataset at this position and replace the
         // contents of the view with that element
         viewHolder.getTextView().setText(localDataSet.get(position).getTask_name());
-        viewHolder.getList_HH().setText(String.valueOf(localDataSet.get(position).getHH()));
-        viewHolder.getList_MM().setText(String.valueOf(localDataSet.get(position).getMM()));
-        viewHolder.getList_SS().setText(String.valueOf(localDataSet.get(position).getSS()));
+        DecimalFormat formatter = new DecimalFormat("00");
+        String HH=formatter.format(localDataSet.get(position).getHH());
+        String MM=formatter.format(localDataSet.get(position).getMM());
+        String SS=formatter.format(localDataSet.get(position).getSS());
+        viewHolder.getList_HH().setText(HH);
+        viewHolder.getList_MM().setText(MM);
+        viewHolder.getList_SS().setText(SS);
     }
 
     // Return the size of your dataset (invoked by the layout manager)
