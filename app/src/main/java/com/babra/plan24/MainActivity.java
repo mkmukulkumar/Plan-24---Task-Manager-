@@ -1,7 +1,6 @@
 package com.babra.plan24;
 
 import android.app.Dialog;
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -12,7 +11,6 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -31,12 +29,13 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView task_list;
     TextView instruction,delete_all;
     NumberPicker pickMM,pickHH,pickSS;
+    List<task_data> all_data;
+    CustomAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         //finding XMLs by ids
         FloatingActionButton fab = findViewById(R.id.fab);
         task_list = findViewById(R.id.task_list);
@@ -51,9 +50,9 @@ public class MainActivity extends AppCompatActivity {
         delete_all.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 deleteAll del = new deleteAll();
                 del.start();
+
             }
         });
 
@@ -107,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
                         input_data.setHH(pickHH.getValue());
                         input_data.setMM(pickMM.getValue());
                         input_data.setSS(pickSS.getValue());
-                        add_ask st1 = new add_ask(input_data);
+                        add_task st1 = new add_task(input_data);
                         st1.start();
                         detail_popup.dismiss();
 
@@ -120,16 +119,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    class add_ask extends Thread {
+
+
+    class add_task extends Thread {
         task_data data3;
-        add_ask(task_data data3) {
+        add_task(task_data data3) {
             this.data3=data3;
         }
         public void run(){
             task_data_database db = Room.databaseBuilder(getApplicationContext(), task_data_database.class, "database-name").build();
             task_data_dao task_data_dao = db.task_data_dao();
             task_data_dao.insert(data3);
-            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+            all_data.add(data3);
         }
     }
 
@@ -138,25 +139,27 @@ public class MainActivity extends AppCompatActivity {
             task_data_database db = Room.databaseBuilder(getApplicationContext(), task_data_database.class, "database-name").build();
             task_data_dao task_data_dao = db.task_data_dao();
             task_data_dao.deleteAll();
-            Toast.makeText(MainActivity.this, "Deleted", Toast.LENGTH_SHORT).show();
-            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+            all_data.clear();
         }
     }
 
 
     class get_all extends Thread {
         public void run() {
+
             task_data_database db1 = Room.databaseBuilder(getApplicationContext(), task_data_database.class, "database-name").build();
             task_data_dao task_data_dao = db1.task_data_dao();
-            List<task_data> all_data = task_data_dao.getAll();
+            all_data = task_data_dao.getAll();
             if (all_data.isEmpty())
                 {
                     instruction.setVisibility(View.VISIBLE);
                 }
+
             //RecyclerView Setup
             task_list.setLayoutManager(new LinearLayoutManager(MainActivity.this));
-            CustomAdapter adapter = new CustomAdapter(all_data);
+            adapter = new CustomAdapter(all_data);
             task_list.setAdapter(adapter);
+
         }
     }
 }
