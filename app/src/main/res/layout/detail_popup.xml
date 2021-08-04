@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -33,7 +32,7 @@
                 android:layout_marginTop="8dp"
                 android:autofillHints="no"
                 android:hint="@string/task_name"
-                android:inputType="textPersonName"
+                android:inputType="textCapSentences"
                 android:textColor="@color/black"
                 android:textSize="18sp" />
 
@@ -56,7 +55,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/Hours"
-                        android:textSize="12dp" />
+                        android:textSize="12sp" />
 
                     <NumberPicker
                         android:id="@+id/pickHH"
@@ -86,7 +85,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/Minutes"
-                        android:textSize="12dp" />
+                        android:textSize="12sp" />
 
                     <NumberPicker
                         android:id="@+id/pickMM"
@@ -117,7 +116,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="@string/Seconds"
-                        android:textSize="12dp" />
+                        android:textSize="12sp" />
 
                     <NumberPicker
                         android:id="@+id/pickSS"

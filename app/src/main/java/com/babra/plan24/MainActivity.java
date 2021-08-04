@@ -11,6 +11,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,17 +21,19 @@ import androidx.room.Room;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements CustomAdapter.ItemClickListener {
     Dialog detail_popup;
     Button cancel_button, save_button;
     EditText popup_task_name;
     RecyclerView task_list;
     TextView instruction,delete_all;
     NumberPicker pickMM,pickHH,pickSS;
-    List<task_data> all_data;
+    List<task_data> all_data=new ArrayList<>();
     CustomAdapter adapter;
+    task_data_dao task_data_dao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,16 +46,25 @@ public class MainActivity extends AppCompatActivity {
         delete_all=findViewById(R.id.delete_all);
         detail_popup = new Dialog(MainActivity.this);
 
-        //getting all data in recyclerview
-        get_all st = new get_all();
-        st.start();
+        get_all st1 = new get_all();
+        st1.start();
+
+        task_list.setLayoutManager(new LinearLayoutManager(this));
+        adapter=new CustomAdapter(this, all_data);
+        task_list.setAdapter(adapter);
+        adapter.setClickListener(this);
 
         delete_all.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                deleteAll del = new deleteAll();
-                del.start();
-
+                adapter.notifyItemRangeRemoved(0,all_data.size());
+                all_data.clear();
+                delete_all st1= new delete_all();
+                st1.start();
+                Toast toast =Toast.makeText(MainActivity.this, "All Tasks Deleted Successfully", Toast.LENGTH_SHORT);
+                toast.setGravity(Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, 0, 150);
+                toast.show();
+                instruction.setVisibility(View.VISIBLE);
             }
         });
 
@@ -101,15 +113,23 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View view) {
                         //Room database setup
+                        detail_popup.dismiss();
                         task_data input_data = new task_data();
                         input_data.setTask_name(popup_task_name.getText().toString().trim());
                         input_data.setHH(pickHH.getValue());
                         input_data.setMM(pickMM.getValue());
                         input_data.setSS(pickSS.getValue());
+                        adapter.notifyItemInserted(all_data.size());
+                        all_data.add(input_data);
+                        if(!all_data.isEmpty())
+                        {
+                            instruction.setVisibility(View.GONE);
+                        }
                         add_task st1 = new add_task(input_data);
                         st1.start();
-                        detail_popup.dismiss();
-
+                        Toast toast =Toast.makeText(MainActivity.this, "Task Added Successfully", Toast.LENGTH_SHORT);
+                        toast.setGravity(Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, 0, 150);
+                        toast.show();
                     }
                 });
 
@@ -118,54 +138,70 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onItemClick(View view, int position) {
+        Toast toast =Toast.makeText(this,"Task Deleted Successfully", Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, 0, 150);
+        toast.show();
+        task_data del=all_data.get(position);
+        all_data.remove(position);
+        adapter.notifyItemRemoved(position);
+        if(all_data.isEmpty())
+        {
+            instruction.setVisibility(View.VISIBLE);
+        }
+        del_task st1 = new del_task(del);
+        st1.start();
+
+    }
 
 
+
+
+    class get_all extends Thread {
+        public void run() {
+            List <task_data> data;
+            task_data_database db1 = Room.databaseBuilder(getApplicationContext(), task_data_database.class, "Plan24data").build();
+            task_data_dao = db1.task_data_dao();
+            data= task_data_dao.getAll();
+            all_data.addAll(data);
+            data.clear();
+            if(all_data.isEmpty())
+            {
+                instruction.setVisibility(View.VISIBLE);
+            }
+        }
+    }
 
     class add_task extends Thread {
         task_data data3;
         add_task(task_data data3) {
             this.data3=data3;
         }
-        public void run(){
-            task_data_database db = Room.databaseBuilder(getApplicationContext(), task_data_database.class, "database-name").build();
-            task_data_dao task_data_dao = db.task_data_dao();
-            task_data_dao.insert(data3);
-            all_data.add(data3);
-        }
-    }
-
-    class deleteAll extends Thread {
-        public void run(){
-            task_data_database db = Room.databaseBuilder(getApplicationContext(), task_data_database.class, "database-name").build();
-            task_data_dao task_data_dao = db.task_data_dao();
-            task_data_dao.deleteAll();
-            all_data.clear();
-        }
-    }
-
-
-    class get_all extends Thread {
         public void run() {
-
-            task_data_database db1 = Room.databaseBuilder(getApplicationContext(), task_data_database.class, "database-name").build();
-            task_data_dao task_data_dao = db1.task_data_dao();
-            all_data = task_data_dao.getAll();
-            if (all_data.isEmpty())
-                {
-                    instruction.setVisibility(View.VISIBLE);
-                }
-
-            //RecyclerView Setup
-            task_list.setLayoutManager(new LinearLayoutManager(MainActivity.this));
-            adapter = new CustomAdapter(all_data);
-            task_list.setAdapter(adapter);
-
+            task_data_dao.insert(data3);
         }
     }
+
+    class delete_all extends Thread {
+        public void run() {
+            task_data_dao.deleteAll();
+        }
+    }
+
+    class del_task extends Thread {
+        task_data data3;
+        del_task(task_data data3) {
+            this.data3=data3;
+        }
+        public void run() {
+            task_data_dao.delete(data3);
+        }
+    }
+
+
 }
 
-
-//delete particular entry needed
 //Refresh after adding or deletion
 //Swipe features if possible
 //UI Enhancement
