@@ -16,13 +16,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <Button
-            android:id="@+id/edit_button"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1.3"
-            android:visibility="gone"
-            android:text="E" />
 
         <TextView
             android:id="@+id/list_task_name"
@@ -95,6 +88,7 @@
 
         <Button
             android:id="@+id/del_button"
+            android:theme="@style/MaterialAlertDialog.MaterialComponents.Title.Panel.CenterStacked"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="2"
