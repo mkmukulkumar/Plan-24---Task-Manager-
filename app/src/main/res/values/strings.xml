@@ -14,5 +14,7 @@
     <string name="Minutes">Minutes</string>
     <string name="Seconds">Seconds</string>
     <string name="Delete_all"><u>Delete All</u></string>
+    <string name="countdown_text">TIME TO PLAN</string>
+    <string name="time_countdown">24:00:00</string>
 
 </resources>
