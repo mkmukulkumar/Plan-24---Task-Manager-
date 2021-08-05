@@ -2,7 +2,7 @@
     <string name="app_name">Plan24</string>
     <string name="instruction">Add task which you want"\n"to do in next 24 hrs</string>
     <string name="FAB">Add task</string>
-    <string name="popup_header">Add Timer for task</string>
+    <string name="popup_header"><u>Add Timer for task</u></string>
     <string name="HH">HH</string>
     <string name="time_separator">:</string>
     <string name="MM">MM</string>
